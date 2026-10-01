@@ -1,382 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maletain Biodata Collector</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Firebase JS SDK v9+ (Modular) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // Your actual Firebase Configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyBf-8pFNCUXBZCw95Q_U-ZoIRdM-JcBQVA",
-      authDomain: "maletain-biodata.firebaseapp.com",
-      projectId: "maletain-biodata",
-      storageBucket: "maletain-biodata.firebasestorage.app",
-      messagingSenderId: "842340864694",
-      appId: "1:842340864694:web:ac984b3395465c474e8c17",
-      measurementId: "G-EV3Q82RHS6"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    // Make db available globally for simple script access
-    window.db = db;
-    window.firestoreTools = { collection, addDoc, getDocs, doc, deleteDoc };
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maletain Biodata Collector</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
-<body class="bg-stone-100 text-gray-800 font-sans min-h-screen pb-16">
-
-  <!-- TOP HEADER BANNER -->
-  <header class="bg-stone-900 text-white shadow-xl py-6 px-4 mb-8">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-4">
-        <!-- ASSOCIATION LOGO (SVG) -->
-        <svg class="w-16 h-16 text-cyan-500 flex-shrink-0" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="100" cy="100" r="90" fill="#121212" stroke="#21b2cc" stroke-width="4"/>
-          <path d="M100 35 C115 35, 125 45, 125 60 C125 75, 115 85, 100 85 C85 85, 75 75, 75 60 C75 45, 85 35, 100 35 Z" fill="#e59b2a"/>
-          <path d="M50 120 C50 95, 70 80, 100 80 C130 80, 150 95, 150 120 V140 H50 Z" fill="#21b2cc"/>
-          <text x="100" y="180" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#ffffff" text-anchor="middle">MALETAIN 6 IN 1</text>
-        </svg>
-        <div>
-          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white">MALETAIN BIODATA COLLECTOR</h1>
-          <p class="text-xs md:text-sm text-cyan-400 font-medium">Maletain 6 in 1 Association — Official Comprehensive Registry</p>
-        </div>
-      </div>
-      <!-- CLOUD STATUS BADGE -->
-      <div class="flex items-center gap-2 bg-stone-800 px-4 py-2 rounded-full border border-stone-700 shadow-inner">
-        <span class="relative flex h-3 w-3">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-        </span>
-        <span class="text-xs font-semibold text-gray-200" id="cloudStatus">Cloud Database Active</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN CONTAINER -->
-  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-    <!-- FORM SECTION -->
-    <section class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-      <h2 class="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200 flex items-center justify-between">
-        <span class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-          Member Registration Form
-        </span>
-        <span class="text-xs text-amber-600 font-medium">* Required fields</span>
-      </h2>
-
-      <form id="biodataForm" onsubmit="saveMember(event)" class="space-y-5">
-        
-        <!-- SECTION 1: PERSONAL IDENTIFICATION -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">1. Personal Details</h3>
-          
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Profile Photo</label>
-            <div class="flex items-center gap-3">
-              <img id="photoPreview" src="https://via.placeholder.com/80?text=Photo" alt="Preview" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm">
-              <input type="file" id="photoInput" accept="image/*" onchange="previewImage(event)" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name *</label>
-            <input type="text" id="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="First, Middle, and Surname">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Gender *</label>
-              <select id="gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-                <option value="">Select</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Date of Birth</label>
-              <input type="date" id="dob" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">National ID / Passport No.</label>
-              <input type="text" id="nationalId" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="NID or ID Number">
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 2: CONTACT & RESIDENCE -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">2. Contact & Current Residence</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Phone Number *</label>
-              <input type="tel" id="phoneNumber" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="+675 ...">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Email Address</label>
-              <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="example@email.com">
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Current Residential Address / Town *</label>
-            <input type="text" id="address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Suburb / Settlement / Town / Province">
-          </div>
-        </div>
-
-        <!-- SECTION 3: TRIBAL & LINEAGE BACKGROUND -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">3. Tribal Lineage & Ancestry</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Clan / Major Tribe *</label>
-              <input type="text" id="clan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Clan Name">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Sub-Clan / Family Line</label>
-              <input type="text" id="subClan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Sub-clan / Hausman">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Ancestral Village *</label>
-              <input type="text" id="village" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Ancestral village name">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Totem / Cultural Symbol</label>
-              <input type="text" id="totem" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Eagle, Snake, Tree emblem">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Father's Name & Lineage</label>
-              <input type="text" id="fatherName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Father's full name">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Mother's Name & Lineage</label>
-              <input type="text" id="motherName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Mother's maiden name/clan">
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 4: HOUSEHOLD & MARITAL STATUS -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">4. Family & Household Details</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Marital Status</label>
-              <select id="maritalStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-                <option value="Widowed">Widowed</option>
-                <option value="Divorced">Divorced</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Spouse's Name</label>
-              <input type="text" id="spouseName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Spouse full name">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">No. of Children/Dependents</label>
-              <input type="number" id="dependents" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="0">
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 5: EDUCATION & EMPLOYMENT -->
-        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
-          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">5. Education & Occupation</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Highest Education Level</label>
-              <select id="educationLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-                <option value="Primary School">Primary School</option>
-                <option value="High School / Secondary">High School / Secondary</option>
-                <option value="TVET / Vocational">TVET / Vocational</option>
-                <option value="Diploma">Diploma</option>
-                <option value="Bachelor's Degree">Bachelor's Degree</option>
-                <option value="Master's / Postgraduate">Master's / Postgraduate</option>
-                <option value="Doctorate (PhD)">Doctorate (PhD)</option>
-                <option value="Customary / Non-Formal">Customary / Non-Formal</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Institution / School Name</label>
-              <input type="text" id="institution" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="School/College Name">
-            </div>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Current Occupation / Job Title</label>
-              <input type="text" id="occupation" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Teacher, Farmer, Student">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Special Vocational Skills / Trade</label>
-              <input type="text" id="skills" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Carpentry, Nursing, Computing">
-            </div>
-          </div>
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-base">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-          Save Complete Biodata
-        </button>
-      </form>
-    </section>
-
-    <!-- DIRECTORY & RECORDS VIEW SECTION -->
-    <section class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-2 border-b border-gray-200">
-        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          Master Registry
-        </h2>
-        <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search name, phone, clan, village..." class="w-full sm:w-64 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-      </div>
-
-      <!-- MEMBER CARDS DISPLAY -->
-      <div id="memberList" class="space-y-4 max-h-[850px] overflow-y-auto pr-2">
-        <!-- Records loaded dynamically from Cloud Database -->
-      </div>
-    </section>
-  </main>
-
-  <script>
-    let photoBase64 = "";
-    let fetchedRecords = [];
-
-    function previewImage(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          photoBase64 = e.target.result;
-          document.getElementById('photoPreview').src = photoBase64;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function saveMember(event) {
-      event.preventDefault();
-      
-      const memberData = {
-        fullName: document.getElementById('fullName').value,
-        gender: document.getElementById('gender').value,
-        dob: document.getElementById('dob').value,
-        nationalId: document.getElementById('nationalId').value,
-        phoneNumber: document.getElementById('phoneNumber').value,
-        email: document.getElementById('email').value,
-        address: document.getElementById('address').value,
-        clan: document.getElementById('clan').value,
-        subClan: document.getElementById('subClan').value,
-        village: document.getElementById('village').value,
-        totem: document.getElementById('totem').value,
-        fatherName: document.getElementById('fatherName').value,
-        motherName: document.getElementById('motherName').value,
-        maritalStatus: document.getElementById('maritalStatus').value,
-        spouseName: document.getElementById('spouseName').value,
-        dependents: document.getElementById('dependents').value,
-        educationLevel: document.getElementById('educationLevel').value,
-        institution: document.getElementById('institution').value,
-        occupation: document.getElementById('occupation').value,
-        skills: document.getElementById('skills').value,
-        photo: photoBase64 || "https://via.placeholder.com/80?text=Photo",
-        createdAt: new Date().toISOString()
-      };
-
-      try {
-        if (window.db && window.firestoreTools) {
-          const { collection, addDoc } = window.firestoreTools;
-          await addDoc(collection(window.db, "maletain_biodata_records"), memberData);
-          alert("Member biodata successfully saved to the cloud database!");
-          document.getElementById('biodataForm').reset();
-          document.getElementById('photoPreview').src = "https://via.placeholder.com/80?text=Photo";
-          photoBase64 = "";
-          loadCloudRecords();
-        } else {
-          alert("Database connection initializing. Please try again in a few seconds.");
-        }
-      } catch (e) {
-        console.error("Error saving to database: ", e);
-        alert("Error saving record: " + e.message);
-      }
-    }
-
-    async function loadCloudRecords() {
-      const container = document.getElementById('memberList');
-      if (!window.db || !window.firestoreTools) return;
-
-      const { collection, getDocs } = window.firestoreTools;
-      try {
-        const querySnapshot = await getDocs(collection(window.db, "maletain_biodata_records"));
-        fetchedRecords = [];
-        querySnapshot.forEach((doc) => {
-          fetchedRecords.push({ id: doc.id, ...doc.data() });
-        });
-        renderRecords(fetchedRecords);
-      } catch (err) {
-        console.error("Error fetching records:", err);
-      }
-    }
-
-    function renderRecords(records) {
-      const container = document.getElementById('memberList');
-      container.innerHTML = "";
-
-      if (records.length === 0) {
-        container.innerHTML = `<p class="text-sm text-gray-500 text-center py-12">No matching records found in database.</p>`;
-        return;
-      }
-
-      records.forEach((data) => {
-        container.innerHTML += `
-          <div class="bg-stone-50 border border-gray-200 p-4 rounded-xl shadow-sm space-y-2">
-            <div class="flex items-start gap-4">
-              <img src="${data.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm flex-shrink-0">
-              <div class="flex-1">
-                <div class="flex items-center justify-between">
-                  <h3 class="font-bold text-gray-900 text-base">${data.fullName}</h3>
-                  <span class="text-[10px] px-2 py-0.5 bg-cyan-100 text-cyan-800 rounded font-semibold">${data.gender || 'N/A'}</span>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+    <!-- ... existing code ... -->
+    <!-- Header / Navbar -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xl border-2 border-indigo-300">
+                    M
                 </div>
-                <p class="text-xs text-gray-600"><strong>Phone:</strong> ${data.phoneNumber || 'N/A'} | <strong>Address:</strong> ${data.address || 'N/A'}</p>
-                <p class="text-xs text-gray-600"><strong>Clan:</strong> ${data.clan} (${data.subClan || 'Main'}) | <strong>Village:</strong> ${data.village}</p>
-              </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight">Maletain Association</h1>
+                    <p class="text-xs text-indigo-200 hidden sm:block">Biodata & Family Lineage Registry</p>
+                </div>
             </div>
             
-            <div class="pt-2 border-t border-gray-200 text-xs grid grid-cols-2 gap-2 text-gray-700">
-              <div><strong>Education:</strong> ${data.educationLevel}</div>
-              <div><strong>Occupation:</strong> ${data.occupation || 'N/A'}</div>
-              <div><strong>Parents:</strong> F: ${data.fatherName || 'N/A'} / M: ${data.motherName || 'N/A'}</div>
-              <div><strong>Family:</strong> ${data.maritalStatus || 'Single'} (${data.dependents || 0} Children)</div>
+            <!-- Auth & Navigation Controls -->
+            <div class="flex items-center space-x-3">
+                <div id="user-profile-badge" class="hidden flex items-center space-x-2 bg-indigo-800/80 px-3 py-1.5 rounded-full text-xs font-medium border border-indigo-700">
+                    <i class="fas font-solid fa-user-circle text-indigo-300 text-sm"></i>
+                    <span id="user-display-email" class="max-w-[120px] sm:max-w-[200px] truncate">user@example.com</span>
+                </div>
+
+                <button id="auth-action-btn" onclick="openAuthModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium transition shadow flex items-center space-x-1.5">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span id="auth-btn-text">Sign In</span>
+                </button>
             </div>
-          </div>
-        `;
-      });
-    }
+        </div>
+    </header>
 
-    function filterRecords() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = fetchedRecords.filter(r => 
-        (r.fullName && r.fullName.toLowerCase().includes(query)) ||
-        (r.clan && r.clan.toLowerCase().includes(query)) ||
-        (r.village && r.village.toLowerCase().includes(query)) ||
-        (r.phoneNumber && r.phoneNumber.toLowerCase().includes(query))
-      );
-      renderRecords(filtered);
-    }
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Auth Protection Banner (Shown when logged out) -->
+        <div id="auth-protection-banner" class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-start space-x-4">
+                <div class="p-3 bg-amber-100 text-amber-700 rounded-xl">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-semibold text-amber-900">Authentication Required for Full Access</h2>
+                    <p class="text-xs sm:text-sm text-amber-700 mt-1">Please log in or create an account to view registered family records and submit new biodata entries.</p>
+                </div>
+            </div>
+            <button onclick="openAuthModal()" class="w-full md:w-auto px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-medium text-sm rounded-lg shadow transition shrink-0">
+                Sign In / Register
+            </button>
+        </div>
 
-    // Load records automatically on startup
-    window.addEventListener('DOMContentLoaded', () => {
-      setTimeout(loadCloudRecords, 1500);
-    });
-  </script>
+        <!-- System Content Wrapper (Blurred/Hidden when logged out) -->
+        <div id="protected-content" class="space-y-6 opacity-40 pointer-events-none transition-all duration-300">
+<!-- ... existing code ... -->
+        </div>
+    </main>
+
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-100 transform transition-all">
+            <!-- Modal Header -->
+            <div class="bg-indigo-900 text-white p-6 relative">
+                <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-indigo-200 hover:text-white text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="w-12 h-12 bg-indigo-700/60 rounded-xl flex items-center justify-center mb-3 text-indigo-200 text-xl font-bold">
+                    <i class="fas fa-user-lock"></i>
+                </div>
+                <h3 id="auth-modal-title" class="text-xl font-bold">Sign In to Maletain</h3>
+                <p id="auth-modal-subtitle" class="text-xs text-indigo-200 mt-1">Access the secure clan biodata registry</p>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-4">
+                <!-- Tab Switching -->
+                <div class="flex border-b border-slate-200 mb-4">
+                    <button id="tab-login-btn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none">
+                        Sign In
+                    </button>
+                    <button id="tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 focus:outline-none">
+                        Create Account
+                    </button>
+                </div>
+
+                <!-- Error Box -->
+                <div id="auth-error" class="hidden bg-red-50 text-red-700 border border-red-200 rounded-lg p-3 text-xs flex items-center space-x-2">
+                    <i class="fas fa-exclamation-circle text-sm shrink-0"></i>
+                    <span id="auth-error-msg">Error occurred</span>
+                </div>
+
+                <!-- Form -->
+                <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Email Address</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-3 text-slate-400 text-sm"></i>
+                            <input type="email" id="auth-email" required placeholder="name@domain.com" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-3 text-slate-400 text-sm"></i>
+                            <input type="password" id="auth-password" required minlength="6" placeholder="••••••••" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="auth-submit-btn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow-md transition flex items-center justify-center space-x-2">
+                        <span id="auth-submit-text">Sign In</span>
+                        <i id="auth-submit-spinner" class="fas fa-spinner fa-spin hidden"></i>
+                    </button>
+                </form>
+
+                <div class="pt-2 text-center">
+                    <p class="text-xs text-slate-500">Protected by Firebase Authentication</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Script Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithCustomToken, 
+            signInAnonymously, 
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            onSnapshot, 
+            doc, 
+            deleteDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global state and configurations
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'maletain-biodata-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "demo-api-key",
+            authDomain: "demo-app.firebaseapp.com",
+            projectId: "demo-app",
+            storageBucket: "demo-app.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let authMode = 'login'; // 'login' or 'register'
+
+        // UI Auth Controls
+        window.openAuthModal = () => {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            hideAuthError();
+        };
+
+        window.closeAuthModal = () => {
+            document.getElementById('auth-modal').classList.add('hidden');
+        };
+
+        window.switchAuthTab = (mode) => {
+            authMode = mode;
+            hideAuthError();
+            const loginBtn = document.getElementById('tab-login-btn');
+            const regBtn = document.getElementById('tab-register-btn');
+            const submitText = document.getElementById('auth-submit-text');
+            const title = document.getElementById('auth-modal-title');
+            const subtitle = document.getElementById('auth-modal-subtitle');
+
+            if (mode === 'login') {
+                loginBtn.className = 'flex-1 py-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
+                regBtn.className = 'flex-1 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 focus:outline-none';
+                submitText.textContent = 'Sign In';
+                title.textContent = 'Sign In to Maletain';
+                subtitle.textContent = 'Access the secure clan biodata registry';
+            } else {
+                regBtn.className = 'flex-1 py-2 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
+                loginBtn.className = 'flex-1 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 focus:outline-none';
+                submitText.textContent = 'Create Account';
+                title.textContent = 'Register New Account';
+                subtitle.textContent = 'Join the association registry system';
+            }
+        };
+
+        function showAuthError(msg) {
+            const errBox = document.getElementById('auth-error');
+            const errText = document.getElementById('auth-error-msg');
+            errText.textContent = msg;
+            errBox.classList.remove('hidden');
+        }
+
+        function hideAuthError() {
+            document.getElementById('auth-error').classList.add('hidden');
+        }
+
+        window.handleAuthSubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value;
+            const password = document.getElementById('auth-password').value;
+            const spinner = document.getElementById('auth-submit-spinner');
+            
+            spinner.classList.remove('hidden');
+            hideAuthError();
+
+            try {
+                if (authMode === 'login') {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                }
+                closeAuthModal();
+                document.getElementById('auth-form').reset();
+            } catch (err) {
+                console.error("Auth Error:", err);
+                showAuthError(err.message.replace('Firebase: ', ''));
+            } finally {
+                spinner.classList.add('hidden');
+            }
+        };
+
+        // Authentication State Listener
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            const badge = document.getElementById('user-profile-badge');
+            const emailSpan = document.getElementById('user-display-email');
+            const authBtnText = document.getElementById('auth-btn-text');
+            const authBtn = document.getElementById('auth-action-btn');
+            const banner = document.getElementById('auth-protection-banner');
+            const protectedContent = document.getElementById('protected-content');
+
+            if (user && !user.isAnonymous) {
+                // Logged in user
+                badge.classList.remove('hidden');
+                emailSpan.textContent = user.email || 'Authenticated User';
+                authBtnText.textContent = 'Sign Out';
+                authBtn.onclick = () => signOut(auth);
+                banner.classList.add('hidden');
+                protectedContent.classList.remove('opacity-40', 'pointer-events-none');
+            } else {
+                // Logged out
+                badge.classList.add('hidden');
+                authBtnText.textContent = 'Sign In';
+                authBtn.onclick = () => window.openAuthModal();
+                banner.classList.remove('hidden');
+                protectedContent.classList.add('opacity-40', 'pointer-events-none');
+            }
+        });
+
+        // Initialize default initial auth token if provided
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            signInWithCustomToken(auth, __initial_auth_token).catch(() => {
+                signInAnonymously(auth);
+            });
+        }
+    </script>
+<!-- ... existing code ... -->
 </body>
 </html>
