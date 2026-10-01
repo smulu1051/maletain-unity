@@ -1,849 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maletain 6 in 1 Association - Biodata Collector</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        maletainTeal: {
-                            50: '#f0fbfd',
-                            100: '#d7f4f9',
-                            500: '#21b2cc',
-                            600: '#1896ad',
-                            700: '#15788c',
-                            900: '#114a57',
-                        },
-                        maletainGold: {
-                            100: '#fef3c7',
-                            500: '#e59b2a',
-                            600: '#ca811b',
-                            700: '#a36312',
-                        },
-                        maletainDark: '#121212'
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        @media print {
-            body * { visibility: hidden; }
-            #printableProfileCard, #printableProfileCard * { visibility: visible; }
-            #printableProfileCard { position: absolute; left: 0; top: 0; width: 100%; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maletain Biodata Collector</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase JS SDK v9+ (Modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your actual Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBf-8pFNCUXBZCw95Q_U-ZoIRdM-JcBQVA",
+      authDomain: "maletain-biodata.firebaseapp.com",
+      projectId: "maletain-biodata",
+      storageBucket: "maletain-biodata.firebasestorage.app",
+      messagingSenderId: "842340864694",
+      appId: "1:842340864694:web:ac984b3395465c474e8c17",
+      measurementId: "G-EV3Q82RHS6"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Make db available globally for simple script access
+    window.db = db;
+    window.firestoreTools = { collection, addDoc, getDocs, doc, deleteDoc, onSnapshot };
+  </script>
 </head>
-<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-maletainTeal-500 selection:text-white">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
 
-    <!-- Header with Official Maletain 6 in 1 Association Logo -->
-    <header class="bg-maletainDark text-white shadow-xl border-b-4 border-maletainTeal-500 sticky top-0 z-30">
-        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-4">
-                <!-- Association Logo SVG Graphic -->
-                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-black/60 rounded-xl p-1.5 border border-maletainTeal-500/40 flex items-center justify-center shrink-0 shadow-lg">
-                    <svg viewBox="0 0 320 220" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Background Frame -->
-                        <rect width="320" height="220" fill="#000000" rx="12"/>
-                        <!-- Circular Emblem -->
-                        <g transform="translate(160,75)">
-                            <!-- Outer figures ring -->
-                            <path d="M-5,-42 C20,-48 38,-30 42,-5 C30,-8 15,-15 5,-28 Z" fill="#21b2cc"/>
-                            <path d="M28,-5 C38,15 25,40 -2,42 C2,30 2,12 12,-2 Z" fill="#e59b2a"/>
-                            <path d="M-2,42 C-25,40 -40,20 -38,-10 C-26,-5 -12,2 -2,22 Z" fill="#21b2cc"/>
-                            <path d="M-38,-10 C-32,-35 -10,-45 10,-42 C2,-32 -10,-20 -20,-12 Z" fill="#e59b2a"/>
-                            <!-- Abstract member heads -->
-                            <circle cx="0" cy="-44" r="7" fill="#21b2cc"/>
-                            <circle cx="44" cy="0" r="7" fill="#e59b2a"/>
-                            <circle cx="0" cy="44" r="7" fill="#21b2cc"/>
-                            <circle cx="-44" cy="0" r="7" fill="#e59b2a"/>
-                            <!-- Center Letter M -->
-                            <text x="0" y="11" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#21b2cc" text-anchor="middle">M</text>
-                        </g>
-                        <!-- Text Logo Base -->
-                        <text x="160" y="165" font-family="'Inter', sans-serif" font-weight="900" font-size="22" fill="#21b2cc" text-anchor="middle" letter-spacing="2">MALETAIN 6 IN</text>
-                        <text x="160" y="195" font-family="'Inter', sans-serif" font-weight="800" font-size="18" fill="#e59b2a" text-anchor="middle" letter-spacing="4">1 ASSOCIATION.</text>
-                    </svg>
-                </div>
-                <div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-maletainGold-500 bg-maletainGold-500/10 px-2 py-0.5 rounded border border-maletainGold-500/20">Official Registry</span>
-                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2 mt-0.5">
-                        Maletain Biodata Collector
-                    </h1>
-                    <p class="text-xs sm:text-sm text-maletainTeal-100 font-medium tracking-wide">
-                        Maletain 6 In 1 Association &bull; Community Census & Heritage Archive
-                    </p>
-                </div>
-            </div>
-
-            <!-- Export / Import Buttons -->
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-                <button onclick="triggerImport()" class="bg-stone-800 hover:bg-stone-700 text-maletainTeal-100 border border-stone-600 text-xs sm:text-sm px-3 py-2 rounded-lg font-medium transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-file-import"></i> Import JSON
-                </button>
-                <input type="file" id="importFileInput" accept=".json" class="hidden" onchange="importJSON(event)">
-
-                <button onclick="exportJSON()" class="bg-maletainTeal-700 hover:bg-maletainTeal-600 text-white border border-maletainTeal-500 text-xs sm:text-sm px-3 py-2 rounded-lg font-medium transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-download"></i> Backup (JSON)
-                </button>
-
-                <button onclick="exportCSV()" class="bg-maletainGold-600 hover:bg-maletainGold-500 text-white text-xs sm:text-sm px-3 py-2 rounded-lg font-medium transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-file-excel"></i> Export (CSV)
-                </button>
-            </div>
+  <!-- TOP HEADER BANNER -->
+  <header class="bg-stone-900 text-white shadow-lg py-6 px-4 mb-8">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <!-- ASSOCIATION LOGO (SVG) -->
+        <svg class="w-16 h-16 text-cyan-500 flex-shrink-0" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="90" fill="#121212" stroke="#21b2cc" stroke-width="4"/>
+          <path d="M100 35 C115 35, 125 45, 125 60 C125 75, 115 85, 100 85 C85 85, 75 75, 75 60 C75 45, 85 35, 100 35 Z" fill="#e59b2a"/>
+          <path d="M50 120 C50 95, 70 80, 100 80 C130 80, 150 95, 150 120 V140 H50 Z" fill="#21b2cc"/>
+          <text x="100" y="180" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#ffffff" text-anchor="middle">MALETAIN 6 IN 1</text>
+        </svg>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white">MALETAIN BIODATA COLLECTOR</h1>
+          <p class="text-xs md:text-sm text-cyan-400 font-medium">Maletain 6 in 1 Association — Official Registry</p>
         </div>
-    </header>
+      </div>
+      <!-- CLOUD STATUS BADGE -->
+      <div class="flex items-center gap-2 bg-stone-800 px-4 py-2 rounded-full border border-stone-700">
+        <span class="relative flex h-3 w-3">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+        </span>
+        <span class="text-xs font-semibold text-gray-200" id="cloudStatus">Cloud Database Sync Active</span>
+      </div>
+    </div>
+  </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <!-- Left Column: Registration Form (7 Cols) -->
-        <section class="lg:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-user-plus text-maletainTeal-600"></i> Member Registration Form
-                        </h2>
-                        <p class="text-xs text-slate-500 mt-1">Maletain 6 In 1 Association Census (* Required fields)</p>
-                    </div>
-                    <span class="bg-maletainTeal-50 text-maletainTeal-900 text-xs px-3 py-1 rounded-full font-bold border border-maletainTeal-100">
-                        Maletain 6 in 1
-                    </span>
-                </div>
+    <!-- FORM SECTION -->
+    <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
+        <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        Member Registration
+      </h2>
 
-                <form id="biodataForm" onsubmit="handleFormSubmit(event)" class="space-y-6">
-                    <input type="hidden" id="memberId">
-                    <input type="hidden" id="photoBase64">
-
-                    <!-- Profile Photo Upload -->
-                    <div class="bg-maletainTeal-50/50 p-4 rounded-xl border border-maletainTeal-100 flex flex-col sm:flex-row items-center gap-5">
-                        <div class="relative shrink-0">
-                            <div id="photoPreviewContainer" class="w-24 h-24 rounded-full border-2 border-maletainTeal-500/50 bg-slate-200 overflow-hidden flex items-center justify-center shadow-md">
-                                <img id="photoPreview" src="" alt="Profile Preview" class="w-full h-full object-cover hidden">
-                                <i id="photoPlaceholderIcon" class="fa-solid fa-user text-3xl text-slate-400"></i>
-                            </div>
-                            <button type="button" id="removePhotoBtn" onclick="removePhoto()" class="hidden absolute top-0 right-0 bg-rose-600 text-white w-6 h-6 rounded-full text-xs flex items-center justify-center shadow-md hover:bg-rose-700 transition" title="Remove Photo">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <div class="space-y-1 text-center sm:text-left flex-grow">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-maletainTeal-900">
-                                Member Profile Picture
-                            </label>
-                            <p class="text-xs text-slate-500">Upload portrait photograph (JPG, PNG, WEBP).</p>
-                            <div class="pt-2">
-                                <label for="photoInput" class="cursor-pointer inline-flex items-center gap-2 bg-maletainTeal-600 hover:bg-maletainTeal-700 text-white text-xs px-3.5 py-2 rounded-lg font-medium transition shadow-sm">
-                                    <i class="fa-solid fa-camera"></i> Upload Photo
-                                </label>
-                                <input type="file" id="photoInput" accept="image/png, image/jpeg, image/webp" class="hidden" onchange="handlePhotoUpload(event)">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 1. Personal Details -->
-                    <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-maletainTeal-900 flex items-center gap-2 bg-maletainTeal-50 p-2 rounded-md border border-maletainTeal-100">
-                            <i class="fa-solid fa-id-card text-maletainTeal-600"></i> 1. Personal Details
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name *</label>
-                                <input type="text" id="fullName" required placeholder="First, Middle, and Surname" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Date of Birth *</label>
-                                <input type="date" id="dob" required class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Gender *</label>
-                                <select id="gender" required class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition bg-white">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Contact Phone</label>
-                                <input type="tel" id="phone" placeholder="+675 ..." class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
-                                <input type="email" id="email" placeholder="member@example.com" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Current Residential Address *</label>
-                                <input type="text" id="address" required placeholder="Village, Ward, District, Town or Province" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 2. Tribal & Lineage Background -->
-                    <div class="space-y-4 pt-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-maletainTeal-900 flex items-center gap-2 bg-maletainTeal-50 p-2 rounded-md border border-maletainTeal-100">
-                            <i class="fa-solid fa-dna text-maletainTeal-600"></i> 2. Tribal & Lineage Background
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Tribe Name *</label>
-                                <input type="text" id="tribe" required value="Maletain" placeholder="e.g. Maletain" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Clan Name *</label>
-                                <input type="text" id="clan" required placeholder="Primary Clan" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Sub-clan / Hausman *</label>
-                                <input type="text" id="subClan" required placeholder="Sub-clan / Hausman" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Ancestral Village *</label>
-                                <input type="text" id="ancestralVillage" required placeholder="Ancestral village or territory" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Totem / Cultural Symbol</label>
-                                <input type="text" id="totem" placeholder="e.g. Eagle, Tree, Sacred Landmark" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Father's Name & Clan *</label>
-                                <input type="text" id="fatherDetails" required placeholder="Father's full name and clan" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Mother's Name & Clan *</label>
-                                <input type="text" id="motherDetails" required placeholder="Mother's name and maiden clan" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. Education & Academic Background -->
-                    <div class="space-y-4 pt-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-maletainTeal-900 flex items-center gap-2 bg-maletainTeal-50 p-2 rounded-md border border-maletainTeal-100">
-                            <i class="fa-solid fa-graduation-cap text-maletainTeal-600"></i> 3. Education & Qualifications
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Highest Education Level *</label>
-                                <select id="educationLevel" required class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition bg-white">
-                                    <option value="">Select Level</option>
-                                    <option value="Primary School">Primary School</option>
-                                    <option value="Secondary / High School">Secondary / High School</option>
-                                    <option value="Vocational / TVET">Vocational / Technical (TVET)</option>
-                                    <option value="Diploma">Diploma</option>
-                                    <option value="Bachelor's Degree">Bachelor's Degree</option>
-                                    <option value="Master's Degree">Master's Degree</option>
-                                    <option value="Doctorate (PhD)">Doctorate (PhD)</option>
-                                    <option value="Informal / Customary">Informal / Customary Education</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Institution / School Name</label>
-                                <input type="text" id="institution" placeholder="Name of school or university" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Field of Study / Major</label>
-                                <input type="text" id="fieldOfStudy" placeholder="e.g. Science, Education, Agriculture" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Graduation / Completion Year</label>
-                                <input type="number" id="gradYear" min="1950" max="2030" placeholder="e.g. 2020" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Certifications / Special Skills</label>
-                                <input type="text" id="qualifications" placeholder="e.g. Teacher Certificate, Mechanics, Carpentry, First Aid" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 4. Household & Family Details -->
-                    <div class="space-y-4 pt-2">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-maletainTeal-900 flex items-center gap-2 bg-maletainTeal-50 p-2 rounded-md border border-maletainTeal-100">
-                            <i class="fa-solid fa-house-user text-maletainTeal-600"></i> 4. Household Information
-                        </h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Head of Household Name</label>
-                                <input type="text" id="headOfHousehold" placeholder="Full name of household head" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-700 mb-1">Number of Household Dependents</label>
-                                <input type="number" id="dependents" min="0" max="40" placeholder="0" class="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Submit & Reset Buttons -->
-                    <div class="pt-4 flex flex-col sm:flex-row gap-3">
-                        <button type="submit" id="submitBtn" class="flex-1 bg-maletainTeal-600 hover:bg-maletainTeal-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 text-sm">
-                            <i class="fa-solid fa-floppy-disk"></i> Save Member Profile
-                        </button>
-                        <button type="button" onclick="clearForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-5 rounded-lg transition text-sm">
-                            Clear / Reset
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </section>
-
-        <!-- Right Column: Member Directory & Search (5 Cols) -->
-        <section class="lg:col-span-5 flex flex-col space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col flex-grow min-h-[500px]">
-                
-                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-users text-maletainTeal-600"></i> Association Directory
-                        </h2>
-                        <p class="text-xs text-slate-500">Maletain 6 In 1 Association Records</p>
-                    </div>
-                    <span id="memberCount" class="bg-maletainTeal-50 text-maletainTeal-900 font-bold text-xs px-3 py-1 rounded-full border border-maletainTeal-200">
-                        0 Members
-                    </span>
-                </div>
-
-                <!-- Search Input -->
-                <div class="mb-4 relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                    <input type="text" id="searchInput" oninput="renderMemberList()" placeholder="Search by name, clan, village, education..." class="w-full pl-9 pr-9 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-maletainTeal-500 focus:border-maletainTeal-500 outline-none transition">
-                    <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-sm">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <!-- Member Cards List Container -->
-                <div id="memberList" class="space-y-3 overflow-y-auto max-h-[700px] flex-grow pr-1">
-                    <!-- Cards dynamically injected -->
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Modal View for Member Details & Printable Profile -->
-    <div id="modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-xs hidden items-center justify-center p-4 z-50 transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full p-6 sm:p-8 space-y-6 relative border border-maletainTeal-100/50 max-h-[90vh] overflow-y-auto">
-            <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center text-lg font-bold transition">
-                &times;
-            </button>
-            <div id="modalContent">
-                <!-- Injected profile card details -->
-            </div>
+      <form id="biodataForm" onsubmit="saveMember(event)" class="space-y-4">
+        <!-- PROFILE PHOTO UPLOAD -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Profile Photo</label>
+          <div class="flex items-center gap-3">
+            <img id="photoPreview" src="https://via.placeholder.com/80?text=Photo" alt="Preview" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm">
+            <input type="file" id="photoInput" accept="image/*" onchange="previewImage(event)" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
+          </div>
         </div>
-    </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-maletainDark text-white px-4 py-3 rounded-xl shadow-xl hidden border border-maletainTeal-500 z-50 text-sm flex items-center gap-2">
-        <i class="fa-solid fa-circle-check text-maletainTeal-500"></i>
-        <span id="toastMsg">Notification message</span>
-    </div>
+        <!-- PERSONAL DETAILS -->
+        <div>
+          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name *</label>
+          <input type="text" id="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="First and Last Name">
+        </div>
 
-    <script>
-        const STORAGE_KEY = 'maletain_6in1_biodata_v4';
-        let members = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Gender *</label>
+            <select id="gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+              <option value="">Select</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Date of Birth</label>
+            <input type="date" id="dob" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+          </div>
+        </div>
 
-        function saveToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(members));
-            renderMemberList();
+        <!-- TRIBAL LINEAGE -->
+        <div class="pt-2 border-t border-gray-100">
+          <label class="block text-xs font-semibold text-cyan-800 uppercase mb-1">Clan / Sub-Clan *</label>
+          <input type="text" id="clan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Clan Name">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-cyan-800 uppercase mb-1">Ancestral Village *</label>
+          <input type="text" id="village" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Village Name">
+        </div>
+
+        <!-- EDUCATION SECTION -->
+        <div class="pt-2 border-t border-gray-100">
+          <label class="block text-xs font-semibold text-amber-800 uppercase mb-1">Highest Education Level</label>
+          <select id="educationLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            <option value="Primary School">Primary School</option>
+            <option value="High School / Secondary">High School / Secondary</option>
+            <option value="TVET / Vocational">TVET / Vocational</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Bachelor's Degree">Bachelor's Degree</option>
+            <option value="Master's / Postgraduate">Master's / Postgraduate</option>
+            <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+            <option value="Customary / Other">Customary / Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-amber-800 uppercase mb-1">Institution / School Name</label>
+          <input type="text" id="institution" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Name of school/university">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg shadow-md transition-colors flex items-center justify-center gap-2 text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+          Save Record To Cloud
+        </button>
+      </form>
+    </section>
+
+    <!-- DIRECTORY VIEW SECTION -->
+    <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-2 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          Association Directory
+        </h2>
+        <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search by name, clan, village..." class="w-full sm:w-64 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+      </div>
+
+      <!-- MEMBER LIST DISPLAY -->
+      <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[550px] overflow-y-auto pr-1">
+        <!-- Records rendered dynamically via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <script>
+    let photoBase64 = "";
+
+    function previewImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          photoBase64 = e.target.result;
+          document.getElementById('photoPreview').src = photoBase64;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function saveMember(event) {
+      event.preventDefault();
+      const memberData = {
+        fullName: document.getElementById('fullName').value,
+        gender: document.getElementById('gender').value,
+        dob: document.getElementById('dob').value,
+        clan: document.getElementById('clan').value,
+        village: document.getElementById('village').value,
+        educationLevel: document.getElementById('educationLevel').value,
+        institution: document.getElementById('institution').value,
+        photo: photoBase64 || "https://via.placeholder.com/80?text=Photo",
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        if (window.db && window.firestoreTools) {
+          const { collection, addDoc } = window.firestoreTools;
+          await addDoc(collection(window.db, "maletain_biodata_records"), memberData);
+          alert("Member record successfully saved to the cloud database!");
+          document.getElementById('biodataForm').reset();
+          document.getElementById('photoPreview').src = "https://via.placeholder.com/80?text=Photo";
+          photoBase64 = "";
+          loadCloudRecords();
+        } else {
+          alert("Database connection initializing. Please try again in 3 seconds.");
+        }
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        alert("Error saving record to database: " + e.message);
+      }
+    }
+
+    async function loadCloudRecords() {
+      const container = document.getElementById('memberList');
+      if (!window.db || !window.firestoreTools) return;
+
+      const { collection, getDocs } = window.firestoreTools;
+      try {
+        const querySnapshot = await getDocs(collection(window.db, "maletain_biodata_records"));
+        container.innerHTML = "";
+        
+        if (querySnapshot.empty) {
+          container.innerHTML = `<p class="text-sm text-gray-500 col-span-2 text-center py-8">No member records found. Use the form to submit entries.</p>`;
+          return;
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3500);
-        }
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          container.innerHTML += `
+            <div class="bg-stone-50 border border-gray-200 p-4 rounded-lg shadow-sm flex items-start gap-3">
+              <img src="${data.photo}" class="w-14 h-14 rounded-full object-cover border border-cyan-500">
+              <div>
+                <h3 class="font-bold text-gray-900 text-sm">${data.fullName}</h3>
+                <p class="text-xs text-gray-600"><strong>Clan:</strong> ${data.clan}</p>
+                <p class="text-xs text-gray-600"><strong>Village:</strong> ${data.village}</p>
+                <span class="inline-block mt-1 text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-semibold">${data.educationLevel}</span>
+              </div>
+            </div>
+          `;
+        });
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
 
-        function handlePhotoUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            if (file.size > 2 * 1024 * 1024) {
-                alert('Image file size exceeds 2MB limit. Please choose a smaller file.');
-                e.target.value = '';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const base64Str = event.target.result;
-                document.getElementById('photoBase64').value = base64Str;
-                displayPreview(base64Str);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function displayPreview(src) {
-            const preview = document.getElementById('photoPreview');
-            const placeholder = document.getElementById('photoPlaceholderIcon');
-            const removeBtn = document.getElementById('removePhotoBtn');
-
-            if (src) {
-                preview.src = src;
-                preview.classList.remove('hidden');
-                placeholder.classList.add('hidden');
-                removeBtn.classList.remove('hidden');
-            } else {
-                preview.src = '';
-                preview.classList.add('hidden');
-                placeholder.classList.remove('hidden');
-                removeBtn.classList.add('hidden');
-            }
-        }
-
-        function removePhoto() {
-            document.getElementById('photoBase64').value = '';
-            document.getElementById('photoInput').value = '';
-            displayPreview(null);
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-
-            const editingId = document.getElementById('memberId').value;
-
-            const memberData = {
-                id: editingId || 'MAL61-' + Date.now().toString().slice(-6),
-                photo: document.getElementById('photoBase64').value || '',
-                fullName: document.getElementById('fullName').value.trim(),
-                dob: document.getElementById('dob').value,
-                gender: document.getElementById('gender').value,
-                phone: document.getElementById('phone').value.trim() || 'N/A',
-                email: document.getElementById('email').value.trim() || 'N/A',
-                address: document.getElementById('address').value.trim(),
-                
-                // Tribal & Lineage details
-                tribe: document.getElementById('tribe').value.trim() || 'Maletain',
-                clan: document.getElementById('clan').value.trim(),
-                subClan: document.getElementById('subClan').value.trim(),
-                ancestralVillage: document.getElementById('ancestralVillage').value.trim(),
-                totem: document.getElementById('totem').value.trim() || 'N/A',
-                fatherDetails: document.getElementById('fatherDetails').value.trim(),
-                motherDetails: document.getElementById('motherDetails').value.trim(),
-
-                // Education Details
-                educationLevel: document.getElementById('educationLevel').value,
-                institution: document.getElementById('institution').value.trim() || 'N/A',
-                fieldOfStudy: document.getElementById('fieldOfStudy').value.trim() || 'N/A',
-                gradYear: document.getElementById('gradYear').value || 'N/A',
-                qualifications: document.getElementById('qualifications').value.trim() || 'N/A',
-
-                // Household Details
-                headOfHousehold: document.getElementById('headOfHousehold').value.trim() || 'N/A',
-                dependents: document.getElementById('dependents').value || '0',
-                
-                updatedAt: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-            };
-
-            if (editingId) {
-                const index = members.findIndex(m => m.id === editingId);
-                if (index !== -1) {
-                    members[index] = memberData;
-                    showToast('Member profile updated successfully!');
-                }
-            } else {
-                members.unshift(memberData);
-                showToast('New member registered successfully!');
-            }
-
-            saveToStorage();
-            clearForm();
-        }
-
-        function clearForm() {
-            document.getElementById('biodataForm').reset();
-            document.getElementById('memberId').value = '';
-            removePhoto();
-            document.getElementById('tribe').value = 'Maletain';
-            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save Member Profile`;
-        }
-
-        function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            renderMemberList();
-        }
-
-        function renderMemberList() {
-            const listContainer = document.getElementById('memberList');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
-            const countBadge = document.getElementById('memberCount');
-            const clearBtn = document.getElementById('clearSearchBtn');
-
-            if (searchVal) {
-                clearBtn.classList.remove('hidden');
-            } else {
-                clearBtn.classList.add('hidden');
-            }
-
-            const filtered = members.filter(m => 
-                m.fullName.toLowerCase().includes(searchVal) ||
-                m.tribe.toLowerCase().includes(searchVal) ||
-                m.clan.toLowerCase().includes(searchVal) ||
-                m.subClan.toLowerCase().includes(searchVal) ||
-                m.ancestralVillage.toLowerCase().includes(searchVal) ||
-                (m.educationLevel && m.educationLevel.toLowerCase().includes(searchVal)) ||
-                (m.institution && m.institution.toLowerCase().includes(searchVal)) ||
-                (m.fieldOfStudy && m.fieldOfStudy.toLowerCase().includes(searchVal)) ||
-                m.id.toLowerCase().includes(searchVal)
-            );
-
-            countBadge.textContent = `${filtered.length} Member${filtered.length === 1 ? '' : 's'}`;
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center py-12 text-slate-400">
-                        <i class="fa-solid fa-folder-open text-4xl mb-3 text-slate-300"></i>
-                        <p class="text-sm font-medium">No registered member records found.</p>
-                    </div>`;
-                return;
-            }
-
-            listContainer.innerHTML = filtered.map(m => {
-                const avatar = m.photo ? 
-                    `<img src="${m.photo}" class="w-full h-full object-cover">` : 
-                    `<div class="w-full h-full bg-slate-200 text-slate-400 flex items-center justify-center text-lg"><i class="fa-solid fa-user"></i></div>`;
-
-                return `
-                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-maletainTeal-50/40 hover:border-maletainTeal-200 transition flex items-center justify-between gap-3 group">
-                    <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-12 h-12 rounded-full overflow-hidden border border-maletainTeal-500/30 shrink-0 shadow-xs">
-                            ${avatar}
-                        </div>
-                        <div class="min-w-0 space-y-0.5">
-                            <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-extrabold px-1.5 py-0.2 rounded bg-maletainTeal-100 text-maletainTeal-900 border border-maletainTeal-200 shrink-0">${m.id}</span>
-                                <h3 class="font-bold text-slate-900 text-sm truncate group-hover:text-maletainTeal-900 transition">${m.fullName}</h3>
-                            </div>
-                            <p class="text-xs text-slate-600 truncate">
-                                ${m.tribe} Tribe &bull; ${m.clan} Clan
-                            </p>
-                            <div class="flex items-center gap-2 flex-wrap text-[11px] text-slate-500">
-                                <span class="truncate"><i class="fa-solid fa-location-dot text-slate-400"></i> ${m.ancestralVillage}</span>
-                                <span class="bg-amber-50 text-amber-900 border border-amber-200 px-1.5 rounded text-[10px] font-semibold"><i class="fa-solid fa-graduation-cap"></i> ${m.educationLevel || 'N/A'}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-1 shrink-0">
-                        <button onclick="viewMember('${m.id}')" class="text-maletainTeal-600 hover:bg-maletainTeal-50 p-2 rounded-lg text-sm transition" title="View Profile">
-                            <i class="fa-solid fa-address-card"></i>
-                        </button>
-                        <button onclick="editMember('${m.id}')" class="text-maletainGold-600 hover:bg-maletainGold-100 p-2 rounded-lg text-sm transition" title="Edit Profile">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button onclick="deleteMember('${m.id}')" class="text-rose-600 hover:bg-rose-50 p-2 rounded-lg text-sm transition" title="Delete Profile">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function viewMember(id) {
-            const m = members.find(item => item.id === id);
-            if (!m) return;
-
-            const avatarHTML = m.photo ? 
-                `<img src="${m.photo}" class="w-full h-full object-cover">` : 
-                `<div class="w-full h-full bg-slate-200 text-slate-400 flex items-center justify-center text-4xl"><i class="fa-solid fa-user"></i></div>`;
-
-            const modalContent = document.getElementById('modalContent');
-            modalContent.innerHTML = `
-                <div id="printableProfileCard">
-                    <!-- Modal Header with Official Maletain Logo -->
-                    <div class="border-b border-slate-200 pb-4 flex flex-col sm:flex-row items-center gap-4">
-                        <div class="w-16 h-16 rounded-xl bg-black p-1 border border-maletainTeal-500 shrink-0">
-                            <svg viewBox="0 0 320 220" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
-                                <rect width="320" height="220" fill="#000000"/>
-                                <g transform="translate(160,75)">
-                                    <path d="M-5,-42 C20,-48 38,-30 42,-5 C30,-8 15,-15 5,-28 Z" fill="#21b2cc"/>
-                                    <path d="M28,-5 C38,15 25,40 -2,42 C2,30 2,12 12,-2 Z" fill="#e59b2a"/>
-                                    <path d="M-2,42 C-25,40 -40,20 -38,-10 C-26,-5 -12,2 -2,22 Z" fill="#21b2cc"/>
-                                    <path d="M-38,-10 C-32,-35 -10,-45 10,-42 C2,-32 -10,-20 -20,-12 Z" fill="#e59b2a"/>
-                                    <circle cx="0" cy="-44" r="7" fill="#21b2cc"/>
-                                    <circle cx="44" cy="0" r="7" fill="#e59b2a"/>
-                                    <circle cx="0" cy="44" r="7" fill="#21b2cc"/>
-                                    <circle cx="-44" cy="0" r="7" fill="#e59b2a"/>
-                                    <text x="0" y="11" font-family="'Inter', sans-serif" font-weight="900" font-size="34" fill="#21b2cc" text-anchor="middle">M</text>
-                                </g>
-                                <text x="160" y="165" font-family="'Inter', sans-serif" font-weight="900" font-size="22" fill="#21b2cc" text-anchor="middle">MALETAIN 6 IN</text>
-                                <text x="160" y="195" font-family="'Inter', sans-serif" font-weight="800" font-size="18" fill="#e59b2a" text-anchor="middle">1 ASSOCIATION.</text>
-                            </svg>
-                        </div>
-                        <div class="text-center sm:text-left flex-grow">
-                            <span class="text-[10px] font-bold text-maletainTeal-900 uppercase tracking-widest bg-maletainTeal-50 px-2 py-0.5 rounded border border-maletainTeal-200">MALETAIN 6 IN 1 ASSOCIATION</span>
-                            <h2 class="text-2xl font-black text-slate-900 mt-0.5">${m.fullName}</h2>
-                            <p class="text-xs text-slate-500">Member ID: <strong>${m.id}</strong> &bull; Date Recorded: ${m.updatedAt}</p>
-                        </div>
-                        <div class="w-20 h-20 rounded-full border-2 border-maletainTeal-500/50 overflow-hidden shrink-0 shadow">
-                            ${avatarHTML}
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 text-sm text-slate-700 mt-4">
-                        <!-- Lineage Details -->
-                        <div class="bg-maletainTeal-50/40 p-4 rounded-xl border border-maletainTeal-100 space-y-2">
-                            <h4 class="text-xs font-bold uppercase text-maletainTeal-900 tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-dna text-maletainTeal-600"></i> Tribal & Lineage Background
-                            </h4>
-                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-sm">
-                                <div><span class="text-slate-500 block">Tribe</span> <strong class="text-slate-800">${m.tribe}</strong></div>
-                                <div><span class="text-slate-500 block">Clan</span> <strong class="text-slate-800">${m.clan}</strong></div>
-                                <div><span class="text-slate-500 block">Sub-clan / Hausman</span> <strong class="text-slate-800">${m.subClan}</strong></div>
-                                <div><span class="text-slate-500 block">Ancestral Village</span> <strong class="text-slate-800">${m.ancestralVillage}</strong></div>
-                                <div><span class="text-slate-500 block">Totem / Symbol</span> <strong class="text-slate-800">${m.totem}</strong></div>
-                                <div><span class="text-slate-500 block">Father's Details</span> <strong class="text-slate-800">${m.fatherDetails}</strong></div>
-                                <div class="col-span-2"><span class="text-slate-500 block">Mother's Details</span> <strong class="text-slate-800">${m.motherDetails}</strong></div>
-                            </div>
-                        </div>
-
-                        <!-- Education Details -->
-                        <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-200/60 space-y-2">
-                            <h4 class="text-xs font-bold uppercase text-amber-900 tracking-wider flex items-center gap-1.5">
-                                <i class="fa-solid fa-graduation-cap text-amber-700"></i> Education & Qualifications
-                            </h4>
-                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:text-sm">
-                                <div><span class="text-slate-500 block">Highest Level</span> <strong class="text-slate-800">${m.educationLevel || 'N/A'}</strong></div>
-                                <div><span class="text-slate-500 block">Graduation Year</span> <strong class="text-slate-800">${m.gradYear || 'N/A'}</strong></div>
-                                <div class="col-span-2"><span class="text-slate-500 block">Institution / School</span> <strong class="text-slate-800">${m.institution || 'N/A'}</strong></div>
-                                <div class="col-span-2"><span class="text-slate-500 block">Field of Study</span> <strong class="text-slate-800">${m.fieldOfStudy || 'N/A'}</strong></div>
-                                <div class="col-span-2"><span class="text-slate-500 block">Special Certifications / Skills</span> <strong class="text-slate-800">${m.qualifications || 'N/A'}</strong></div>
-                            </div>
-                        </div>
-
-                        <!-- Personal & Household Details -->
-                        <div class="grid grid-cols-2 gap-3 text-xs sm:text-sm pt-1">
-                            <div><span class="text-slate-500 block">Date of Birth</span> <strong>${m.dob}</strong></div>
-                            <div><span class="text-slate-500 block">Gender</span> <strong>${m.gender}</strong></div>
-                            <div><span class="text-slate-500 block">Contact Phone</span> <strong>${m.phone}</strong></div>
-                            <div><span class="text-slate-500 block">Email Address</span> <strong>${m.email}</strong></div>
-                            <div><span class="text-slate-500 block">Head of Household</span> <strong>${m.headOfHousehold || 'N/A'}</strong></div>
-                            <div><span class="text-slate-500 block">Dependents</span> <strong>${m.dependents || '0'}</strong></div>
-                            <div class="col-span-2"><span class="text-slate-500 block">Residential Address</span> <strong>${m.address}</strong></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-100 flex flex-wrap justify-end gap-2">
-                    <button onclick="window.print()" class="bg-maletainDark hover:bg-black text-white text-xs px-3.5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition">
-                        <i class="fa-solid fa-print"></i> Print Profile
-                    </button>
-                    <button onclick="downloadSingleProfile('${m.id}')" class="bg-maletainTeal-600 hover:bg-maletainTeal-700 text-white text-xs px-3.5 py-2.5 rounded-lg shadow font-medium flex items-center gap-2 transition">
-                        <i class="fa-solid fa-file-arrow-down"></i> Summary (.txt)
-                    </button>
-                    <button onclick="closeModal()" class="bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs px-3.5 py-2.5 rounded-lg font-medium transition">
-                        Close
-                    </button>
-                </div>
-            `;
-            document.getElementById('modal').classList.remove('hidden');
-            document.getElementById('modal').classList.add('flex');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-            document.getElementById('modal').classList.remove('flex');
-        }
-
-        function editMember(id) {
-            const m = members.find(item => item.id === id);
-            if (!m) return;
-
-            document.getElementById('memberId').value = m.id;
-            document.getElementById('photoBase64').value = m.photo || '';
-            displayPreview(m.photo || null);
-
-            document.getElementById('fullName').value = m.fullName;
-            document.getElementById('dob').value = m.dob;
-            document.getElementById('gender').value = m.gender;
-            document.getElementById('phone').value = m.phone === 'N/A' ? '' : m.phone;
-            document.getElementById('email').value = m.email === 'N/A' ? '' : m.email;
-            document.getElementById('address').value = m.address;
-            
-            document.getElementById('tribe').value = m.tribe || 'Maletain';
-            document.getElementById('clan').value = m.clan;
-            document.getElementById('subClan').value = m.subClan;
-            document.getElementById('ancestralVillage').value = m.ancestralVillage;
-            document.getElementById('totem').value = m.totem === 'N/A' ? '' : m.totem;
-            document.getElementById('fatherDetails').value = m.fatherDetails || '';
-            document.getElementById('motherDetails').value = m.motherDetails || '';
-
-            document.getElementById('educationLevel').value = m.educationLevel || '';
-            document.getElementById('institution').value = m.institution === 'N/A' ? '' : m.institution;
-            document.getElementById('fieldOfStudy').value = m.fieldOfStudy === 'N/A' ? '' : m.fieldOfStudy;
-            document.getElementById('gradYear').value = m.gradYear === 'N/A' ? '' : m.gradYear;
-            document.getElementById('qualifications').value = m.qualifications === 'N/A' ? '' : m.qualifications;
-
-            document.getElementById('headOfHousehold').value = m.headOfHousehold === 'N/A' ? '' : m.headOfHousehold;
-            document.getElementById('dependents').value = m.dependents || '';
-
-            document.getElementById('submitBtn').innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Update Member Profile`;
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast('Loaded profile details for editing.');
-        }
-
-        function deleteMember(id) {
-            const m = members.find(item => item.id === id);
-            if (!m) return;
-
-            if (confirm(`Are you sure you want to remove ${m.fullName} from the registry?`)) {
-                members = members.filter(item => item.id !== id);
-                saveToStorage();
-                showToast('Member record removed.');
-            }
-        }
-
-        function exportJSON() {
-            if (members.length === 0) return alert('No member records to export.');
-            
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(members, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", `maletain_6in1_association_backup_${new Date().toISOString().slice(0,10)}.json`);
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-            showToast('JSON backup exported!');
-        }
-
-        function triggerImport() {
-            document.getElementById('importFileInput').click();
-        }
-
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (Array.isArray(importedData)) {
-                        members = importedData;
-                        saveToStorage();
-                        showToast(`Imported ${members.length} members successfully!`);
-                    } else {
-                        alert('Invalid JSON structure.');
-                    }
-                } catch (err) {
-                    alert('Error reading JSON file.');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = '';
-        }
-
-        function exportCSV() {
-            if (members.length === 0) return alert('No records available to export.');
-
-            const headers = [
-                "Member ID", "Full Name", "Date of Birth", "Gender", "Phone", "Email", "Address",
-                "Tribe", "Clan", "Sub-Clan", "Ancestral Village", "Totem", "Father Details", "Mother Details",
-                "Education Level", "Institution", "Field of Study", "Graduation Year", "Qualifications",
-                "Head of Household", "Dependents", "Has Photo", "Last Updated"
-            ];
-
-            const rows = members.map(m => [
-                `"${m.id}"`,
-                `"${m.fullName}"`,
-                `"${m.dob}"`,
-                `"${m.gender}"`,
-                `"${m.phone}"`,
-                `"${m.email}"`,
-                `"${m.address}"`,
-                `"${m.tribe}"`,
-                `"${m.clan}"`,
-                `"${m.subClan}"`,
-                `"${m.ancestralVillage}"`,
-                `"${m.totem}"`,
-                `"${m.fatherDetails}"`,
-                `"${m.motherDetails}"`,
-                `"${m.educationLevel || ''}"`,
-                `"${m.institution || ''}"`,
-                `"${m.fieldOfStudy || ''}"`,
-                `"${m.gradYear || ''}"`,
-                `"${m.qualifications || ''}"`,
-                `"${m.headOfHousehold || ''}"`,
-                `"${m.dependents || '0'}"`,
-                `"${m.photo ? 'Yes' : 'No'}"`,
-                `"${m.updatedAt}"`
-            ]);
-
-            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", csvContent);
-            dlAnchor.setAttribute("download", `maletain_6in1_association_registry_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-            showToast('CSV registry exported!');
-        }
-
-        function downloadSingleProfile(id) {
-            const m = members.find(item => item.id === id);
-            if (!m) return;
-
-            const textCard = `=====================================================
-MALETAIN 6 IN 1 ASSOCIATION - MEMBER BIODATA PROFILE
-=====================================================
-Member ID:              ${m.id}
-Full Name:              ${m.fullName}
-Date of Birth:          ${m.dob}
-Gender:                 ${m.gender}
-Contact Phone:          ${m.phone}
-Email Address:          ${m.email}
-Residential Address:    ${m.address}
-Profile Picture:        ${m.photo ? 'Attached / Stored' : 'None'}
-
-TRIBAL & CLAN LINEAGE
------------------------------------------------------
-Tribe Name:             ${m.tribe}
-Clan:                   ${m.clan}
-Sub-Clan / Hausman:     ${m.subClan}
-Ancestral Village:      ${m.ancestralVillage}
-Totem Symbol:           ${m.totem}
-Father's Name & Clan:   ${m.fatherDetails}
-Mother's Name & Clan:   ${m.motherDetails}
-
-EDUCATION & QUALIFICATIONS
------------------------------------------------------
-Highest Education Level:${m.educationLevel || 'N/A'}
-Institution / School:   ${m.institution || 'N/A'}
-Field of Study / Major: ${m.fieldOfStudy || 'N/A'}
-Completion Year:        ${m.gradYear || 'N/A'}
-Certifications / Skills:${m.qualifications || 'N/A'}
-
-HOUSEHOLD & FAMILY
------------------------------------------------------
-Head of Household:      ${m.headOfHousehold || 'N/A'}
-Number of Dependents:   ${m.dependents || '0'}
-
-Record Date:            ${m.updatedAt}
-=====================================================`;
-
-            const blob = new Blob([textCard], { type: "text/plain;charset=utf-8" });
-            const dlAnchor = document.createElement('a');
-            dlAnchor.href = URL.createObjectURL(blob);
-            dlAnchor.download = `maletain_${m.fullName.toLowerCase().replace(/\s+/g, '_')}_biodata.txt`;
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
-            showToast(`Downloaded summary for ${m.fullName}`);
-        }
-
-        // Initial Load
-        renderMemberList();
-    </script>
+    // Auto load on start
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(loadCloudRecords, 1500);
+    });
+  </script>
 </body>
 </html>
