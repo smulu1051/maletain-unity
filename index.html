@@ -61,6 +61,24 @@
     <!-- Main Content Container -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
+        <!-- API Key Configuration Alert Banner (Shown if API key is unconfigured) -->
+        <div id="config-warning-banner" class="hidden mb-6 bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
+            <div class="flex items-start space-x-4">
+                <div class="p-3 bg-red-100 text-red-800 rounded-xl shrink-0">
+                    <i class="fas fa-exclamation-triangle text-2xl"></i>
+                </div>
+                <div class="space-y-1">
+                    <h2 class="text-base font-bold text-red-900">Firebase API Key Required</h2>
+                    <p class="text-xs sm:text-sm text-red-700">
+                        Please insert your valid <strong>apiKey</strong> into the <code>firebaseConfig</code> script variable in <code>index.html</code>.
+                    </p>
+                    <p class="text-xs text-red-600 font-mono mt-1 bg-red-100/60 p-2 rounded border border-red-200">
+                        Firebase Console -> Project Settings -> Your Apps -> Web App (&lt;/&gt;) -> Copy apiKey
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <!-- Auth Protection Banner (Shown when logged out) -->
         <div id="auth-protection-banner" class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-start space-x-4">
@@ -189,7 +207,7 @@
                             <div class="flex items-center space-x-2">
                                 <button onclick="exportToCSV()" title="Export CSV" class="p-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-lg text-xs font-medium transition flex items-center space-x-1.5">
                                     <i class="fas fa-file-csv text-indigo-600 text-sm"></i>
-                                    <span class="hidden sm:inline">Export</span>
+                                    <span class="hidden sm:inline">Export CSV</span>
                                 </button>
                             </div>
                         </div>
@@ -212,7 +230,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="registry-table-body" class="divide-y divide-slate-100">
-                                    <!-- Dynamic Table Rows -->
                                     <tr id="empty-registry-row">
                                         <td colspan="4" class="py-12 text-center text-slate-400">
                                             <i class="fas fa-folder-open text-3xl mb-2 text-slate-300"></i>
@@ -306,8 +323,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
             getAuth, 
-            signInWithCustomToken, 
-            signInAnonymously, 
             signInWithEmailAndPassword,
             createUserWithEmailAndPassword,
             signOut,
@@ -323,32 +338,31 @@
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global State & Configuration
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'maletain-biodata-app';
-        
-        // Dynamically load Firebase config provided by the environment, or fail gracefully with clear diagnostic feedback
-        let firebaseConfig = null;
-        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-            try {
-                firebaseConfig = typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-            } catch (err) {
-                console.warn("Could not parse __firebase_config:", err);
-            }
+        // =========================================================================
+        // STEP 1: PASTE YOUR FIREBASE CONFIGURATION HERE AFTER REGISTERING WEB APP
+        // =========================================================================
+        const firebaseConfig = {
+            // Replace "YOUR_FIREBASE_API_KEY" with the exact key from Firebase Console -> Project Settings -> Your Apps
+            apiKey: "YOUR_FIREBASE_API_KEY",
+            authDomain: "maletain-biodata.firebaseapp.com",
+            projectId: "maletain-biodata",
+            storageBucket: "maletain-biodata.firebasestorage.app",
+            messagingSenderId: "842340864694",
+            appId: "1:842340864694:web:ac984b3395465c474e8c17"
+        };
+
+        // Check if config has been properly updated by the user
+        const isConfigValid = firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_FIREBASE_API_KEY";
+
+        if (!isConfigValid) {
+            console.warn("Firebase configuration is using placeholder values. Please update firebaseConfig.apiKey");
+            document.getElementById('config-warning-banner').classList.remove('hidden');
         }
 
-        // Initialize Firebase app safely
+        // Initialize Firebase safely
         let app, auth, db;
         try {
-            if (firebaseConfig && firebaseConfig.apiKey) {
-                app = initializeApp(firebaseConfig);
-            } else {
-                // Initialize default instance to prevent runtime crashes if configuration is absent
-                app = initializeApp({
-                    apiKey: "AIzaSy_demo_key_placeholder",
-                    authDomain: `${appId}.firebaseapp.com`,
-                    projectId: appId
-                });
-            }
+            app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
         } catch (initErr) {
@@ -360,7 +374,36 @@
         let registryRecords = [];
         let unsubscribeRegistry = null;
 
-        // --- Auth UI Methods ---
+        // Toast Messages Helper
+        window.showToast = (msg, type = 'info') => {
+            const toast = document.getElementById('status-toast');
+            const toastMsg = document.getElementById('status-toast-msg');
+            const toastIcon = document.getElementById('status-toast-icon');
+
+            toastMsg.textContent = msg;
+            toast.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-indigo-50', 'text-indigo-800', 'bg-red-50', 'text-red-800');
+
+            if (type === 'success') {
+                toast.classList.add('bg-green-50', 'text-green-800', 'border', 'border-green-200');
+                toastIcon.className = 'fas fa-check-circle text-green-600 text-lg';
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+                toastIcon.className = 'fas fa-exclamation-circle text-red-600 text-lg';
+            } else {
+                toast.classList.add('bg-indigo-50', 'text-indigo-800', 'border', 'border-indigo-200');
+                toastIcon.className = 'fas fa-info-circle text-indigo-600 text-lg';
+            }
+
+            setTimeout(() => {
+                dismissToast();
+            }, 4000);
+        };
+
+        window.dismissToast = () => {
+            document.getElementById('status-toast').classList.add('hidden');
+        };
+
+        // Auth UI Handlers
         window.openAuthModal = () => {
             document.getElementById('auth-modal').classList.remove('hidden');
             hideAuthError();
@@ -417,9 +460,15 @@
             document.getElementById('auth-error').classList.add('hidden');
         }
 
-        // --- Handle Sign In / Register Submit ---
+        // Authentication Handler
         window.handleAuthSubmit = async (e) => {
             e.preventDefault();
+
+            if (!isConfigValid) {
+                showAuthError("<strong>API Key Missing:</strong> Please update the <code>apiKey</code> in <code>index.html</code> with your Firebase Console API Key.");
+                return;
+            }
+
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
             const spinner = document.getElementById('auth-submit-spinner');
@@ -438,19 +487,17 @@
                 closeAuthModal();
                 document.getElementById('auth-form').reset();
             } catch (err) {
-                console.error("Auth Error Code:", err.code, "Message:", err.message);
-                let friendlyMsg = err.message ? err.message.replace('Firebase: ', '') : 'An unexpected error occurred.';
+                console.error("Auth Error:", err);
+                let friendlyMsg = err.message ? err.message.replace('Firebase: ', '') : 'An error occurred during authentication.';
                 
                 if (err.code === 'auth/api-key-not-valid' || err.code === 'auth/invalid-api-key') {
-                    friendlyMsg = '<strong>API Key Error:</strong> Invalid or missing Firebase API Key. Please verify environment initialization.';
+                    friendlyMsg = '<strong>Invalid API Key:</strong> The key in index.html is rejected by Firebase. Please generate a new key under Firebase Console > Project Settings.';
                 } else if (err.code === 'auth/invalid-credential') {
-                    friendlyMsg = 'Invalid email or password credentials.';
+                    friendlyMsg = 'Invalid email address or password.';
                 } else if (err.code === 'auth/email-already-in-use') {
                     friendlyMsg = 'An account with this email address already exists.';
                 } else if (err.code === 'auth/weak-password') {
-                    friendlyMsg = 'Password must be at least 6 characters long.';
-                } else if (err.code === 'auth/network-request-failed') {
-                    friendlyMsg = 'Network connection failure. Please check your internet connection.';
+                    friendlyMsg = 'Password must be at least 6 characters.';
                 }
                 
                 showAuthError(friendlyMsg);
@@ -459,7 +506,7 @@
             }
         };
 
-        // --- Authentication Listener ---
+        // Auth State Change Monitor
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             const badge = document.getElementById('user-profile-badge');
@@ -470,28 +517,16 @@
             const banner = document.getElementById('auth-protection-banner');
             const protectedContent = document.getElementById('protected-content');
 
-            if (user && !user.isAnonymous) {
-                // Logged in
+            if (user) {
+                // User active
                 badge.classList.remove('hidden');
                 emailSpan.textContent = user.email || 'Authenticated User';
                 authBtnText.textContent = 'Sign Out';
                 authIcon.className = 'fas fa-sign-out-alt';
                 authBtn.onclick = () => {
                     signOut(auth);
-                    showToast('You have been signed out.', 'info');
+                    showToast('Signed out successfully.', 'info');
                 };
-                banner.classList.add('hidden');
-                protectedContent.classList.remove('opacity-40', 'pointer-events-none');
-
-                // Start Listening to Firestore Database
-                subscribeToRegistry();
-            } else if (user && user.isAnonymous) {
-                // Anonymous session active
-                badge.classList.remove('hidden');
-                emailSpan.textContent = 'Guest Session';
-                authBtnText.textContent = 'Sign In';
-                authIcon.className = 'fas fa-sign-in-alt';
-                authBtn.onclick = () => window.openAuthModal();
                 banner.classList.add('hidden');
                 protectedContent.classList.remove('opacity-40', 'pointer-events-none');
 
@@ -513,13 +548,158 @@
             }
         });
 
-        // --- Initial Authentication Token Processing ---
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            signInWithCustomToken(auth, __initial_auth_token).catch((err) => {
-                console.warn("Custom token auth failed, attempting anonymous auth:", err);
-                signInAnonymously(auth).catch((anonErr) => {
-                    console.error("Anonymous authentication error:", anonErr);
+        // Firestore Real-time Listener
+        function subscribeToRegistry() {
+            if (!db) return;
+            
+            const colRef = collection(db, "biodata");
+            unsubscribeRegistry = onSnapshot(colRef, (snapshot) => {
+                registryRecords = [];
+                snapshot.forEach((docSnap) => {
+                    registryRecords.push({ id: docSnap.id, ...docSnap.data() });
                 });
+                renderRegistryTable(registryRecords);
+                document.getElementById('last-updated-time').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+            }, (err) => {
+                console.error("Firestore Listen Error:", err);
+                showToast("Error synchronizing records.", "error");
             });
         }
-<!-- ... existing code -->
+
+        // Form Submission
+        window.handleBiodataSubmit = async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast("You must be logged in to register records.", "error");
+                return;
+            }
+
+            const spinner = document.getElementById('biodata-spinner');
+            const submitBtn = document.getElementById('submit-biodata-btn');
+
+            spinner.classList.remove('hidden');
+            submitBtn.disabled = true;
+
+            const recordData = {
+                fullName: document.getElementById('full-name').value.trim(),
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                clanBranch: document.getElementById('clan-branch').value.trim(),
+                village: document.getElementById('village').value.trim(),
+                fatherName: document.getElementById('father-name').value.trim() || 'N/A',
+                motherName: document.getElementById('mother-name').value.trim() || 'N/A',
+                contactPhone: document.getElementById('contact-phone').value.trim() || 'N/A',
+                childrenCount: parseInt(document.getElementById('children-count').value) || 0,
+                createdBy: currentUser.email,
+                createdAt: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "biodata"), recordData);
+                showToast('Member biodata registered successfully!', 'success');
+                document.getElementById('biodata-form').reset();
+            } catch (err) {
+                console.error("Error adding document:", err);
+                showToast('Failed to save record: ' + err.message, 'error');
+            } finally {
+                spinner.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        };
+
+        // Delete Record
+        window.deleteRecord = async (id) => {
+            if (!confirm("Are you sure you want to delete this record?")) return;
+            try {
+                await deleteDoc(doc(db, "biodata", id));
+                showToast('Record deleted.', 'info');
+            } catch (err) {
+                console.error("Delete Error:", err);
+                showToast("Failed to delete record.", "error");
+            }
+        };
+
+        // Filter Records
+        window.filterRecords = () => {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = registryRecords.filter(r => 
+                (r.fullName && r.fullName.toLowerCase().includes(query)) ||
+                (r.clanBranch && r.clanBranch.toLowerCase().includes(query)) ||
+                (r.village && r.village.toLowerCase().includes(query))
+            );
+            renderRegistryTable(filtered);
+        };
+
+        // Render Table Data
+        function renderRegistryTable(records) {
+            const tbody = document.getElementById('registry-table-body');
+            const counter = document.getElementById('record-counter');
+            counter.textContent = records.length;
+
+            if (records.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="empty-registry-row">
+                        <td colspan="4" class="py-12 text-center text-slate-400">
+                            <i class="fas fa-folder-open text-3xl mb-2 text-slate-300"></i>
+                            <p class="text-xs">No records found matching criteria.</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = records.map(r => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-3 px-3">
+                        <div class="font-semibold text-slate-800">${r.fullName || 'N/A'}</div>
+                        <div class="text-[11px] text-slate-400">DOB: ${r.dob || 'N/A'} • ${r.gender || 'N/A'}</div>
+                    </td>
+                    <td class="py-3 px-3">
+                        <div class="text-slate-700">${r.clanBranch || 'N/A'}</div>
+                        <div class="text-[11px] text-slate-400"><i class="fas fa-map-marker-alt text-red-400 mr-1"></i>${r.village || 'N/A'}</div>
+                    </td>
+                    <td class="py-3 px-3">
+                        <div class="text-slate-600 text-xs">F: ${r.fatherName || 'N/A'}</div>
+                        <div class="text-slate-600 text-xs">M: ${r.motherName || 'N/A'}</div>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <button onclick="deleteRecord('${r.id}')" title="Delete Record" class="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Export to CSV
+        window.exportToCSV = () => {
+            if (registryRecords.length === 0) {
+                showToast("No data available to export.", "error");
+                return;
+            }
+
+            const headers = ["Full Name", "DOB", "Gender", "Clan Branch", "Village", "Father Name", "Mother Name", "Contact Phone", "Children Count"];
+            const rows = registryRecords.map(r => [
+                `"${r.fullName || ''}"`,
+                `"${r.dob || ''}"`,
+                `"${r.gender || ''}"`,
+                `"${r.clanBranch || ''}"`,
+                `"${r.village || ''}"`,
+                `"${r.fatherName || ''}"`,
+                `"${r.motherName || ''}"`,
+                `"${r.contactPhone || ''}"`,
+                `"${r.childrenCount || 0}"`
+            ]);
+
+            const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Maletain_Biodata_Registry_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Exported registry CSV file.", "success");
+        };
+    </script>
+</body>
+</html>
