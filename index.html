@@ -9,7 +9,7 @@
   <!-- Firebase JS SDK v9+ (Modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // Your actual Firebase Configuration
     const firebaseConfig = {
@@ -28,14 +28,14 @@
 
     // Make db available globally for simple script access
     window.db = db;
-    window.firestoreTools = { collection, addDoc, getDocs, doc, deleteDoc, onSnapshot };
+    window.firestoreTools = { collection, addDoc, getDocs, doc, deleteDoc };
   </script>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-12">
+<body class="bg-stone-100 text-gray-800 font-sans min-h-screen pb-16">
 
   <!-- TOP HEADER BANNER -->
-  <header class="bg-stone-900 text-white shadow-lg py-6 px-4 mb-8">
-    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+  <header class="bg-stone-900 text-white shadow-xl py-6 px-4 mb-8">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-4">
         <!-- ASSOCIATION LOGO (SVG) -->
         <svg class="w-16 h-16 text-cyan-500 flex-shrink-0" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -46,118 +46,211 @@
         </svg>
         <div>
           <h1 class="text-2xl md:text-3xl font-extrabold tracking-wide text-white">MALETAIN BIODATA COLLECTOR</h1>
-          <p class="text-xs md:text-sm text-cyan-400 font-medium">Maletain 6 in 1 Association — Official Registry</p>
+          <p class="text-xs md:text-sm text-cyan-400 font-medium">Maletain 6 in 1 Association — Official Comprehensive Registry</p>
         </div>
       </div>
       <!-- CLOUD STATUS BADGE -->
-      <div class="flex items-center gap-2 bg-stone-800 px-4 py-2 rounded-full border border-stone-700">
+      <div class="flex items-center gap-2 bg-stone-800 px-4 py-2 rounded-full border border-stone-700 shadow-inner">
         <span class="relative flex h-3 w-3">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
         </span>
-        <span class="text-xs font-semibold text-gray-200" id="cloudStatus">Cloud Database Sync Active</span>
+        <span class="text-xs font-semibold text-gray-200" id="cloudStatus">Cloud Database Active</span>
       </div>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <main class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
 
     <!-- FORM SECTION -->
-    <section class="lg:col-span-1 bg-white p-6 rounded-xl shadow-md border border-gray-200">
-      <h2 class="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200 flex items-center gap-2">
-        <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-        Member Registration
+    <section class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200 flex items-center justify-between">
+        <span class="flex items-center gap-2">
+          <svg class="w-5 h-5 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          Member Registration Form
+        </span>
+        <span class="text-xs text-amber-600 font-medium">* Required fields</span>
       </h2>
 
-      <form id="biodataForm" onsubmit="saveMember(event)" class="space-y-4">
-        <!-- PROFILE PHOTO UPLOAD -->
-        <div>
-          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Profile Photo</label>
-          <div class="flex items-center gap-3">
-            <img id="photoPreview" src="https://via.placeholder.com/80?text=Photo" alt="Preview" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm">
-            <input type="file" id="photoInput" accept="image/*" onchange="previewImage(event)" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
-          </div>
-        </div>
-
-        <!-- PERSONAL DETAILS -->
-        <div>
-          <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name *</label>
-          <input type="text" id="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="First and Last Name">
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
+      <form id="biodataForm" onsubmit="saveMember(event)" class="space-y-5">
+        
+        <!-- SECTION 1: PERSONAL IDENTIFICATION -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">1. Personal Details</h3>
+          
           <div>
-            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Gender *</label>
-            <select id="gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-              <option value="">Select</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-            </select>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Profile Photo</label>
+            <div class="flex items-center gap-3">
+              <img id="photoPreview" src="https://via.placeholder.com/80?text=Photo" alt="Preview" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm">
+              <input type="file" id="photoInput" accept="image/*" onchange="previewImage(event)" class="text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-cyan-50 file:text-cyan-700 hover:file:bg-cyan-100">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name *</label>
+            <input type="text" id="fullName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="First, Middle, and Surname">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Gender *</label>
+              <select id="gender" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                <option value="">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Date of Birth</label>
+              <input type="date" id="dob" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">National ID / Passport No.</label>
+              <input type="text" id="nationalId" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="NID or ID Number">
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: CONTACT & RESIDENCE -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">2. Contact & Current Residence</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Phone Number *</label>
+              <input type="tel" id="phoneNumber" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="+675 ...">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Email Address</label>
+              <input type="email" id="email" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="example@email.com">
+            </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Date of Birth</label>
-            <input type="date" id="dob" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+            <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Current Residential Address / Town *</label>
+            <input type="text" id="address" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Suburb / Settlement / Town / Province">
           </div>
         </div>
 
-        <!-- TRIBAL LINEAGE -->
-        <div class="pt-2 border-t border-gray-100">
-          <label class="block text-xs font-semibold text-cyan-800 uppercase mb-1">Clan / Sub-Clan *</label>
-          <input type="text" id="clan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Clan Name">
+        <!-- SECTION 3: TRIBAL & LINEAGE BACKGROUND -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">3. Tribal Lineage & Ancestry</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Clan / Major Tribe *</label>
+              <input type="text" id="clan" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Clan Name">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Sub-Clan / Family Line</label>
+              <input type="text" id="subClan" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Sub-clan / Hausman">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Ancestral Village *</label>
+              <input type="text" id="village" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Ancestral village name">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Totem / Cultural Symbol</label>
+              <input type="text" id="totem" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Eagle, Snake, Tree emblem">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Father's Name & Lineage</label>
+              <input type="text" id="fatherName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Father's full name">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Mother's Name & Lineage</label>
+              <input type="text" id="motherName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Mother's maiden name/clan">
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-cyan-800 uppercase mb-1">Ancestral Village *</label>
-          <input type="text" id="village" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Village Name">
+        <!-- SECTION 4: HOUSEHOLD & MARITAL STATUS -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">4. Family & Household Details</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Marital Status</label>
+              <select id="maritalStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                <option value="Single">Single</option>
+                <option value="Married">Married</option>
+                <option value="Widowed">Widowed</option>
+                <option value="Divorced">Divorced</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Spouse's Name</label>
+              <input type="text" id="spouseName" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Spouse full name">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">No. of Children/Dependents</label>
+              <input type="number" id="dependents" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="0">
+            </div>
+          </div>
         </div>
 
-        <!-- EDUCATION SECTION -->
-        <div class="pt-2 border-t border-gray-100">
-          <label class="block text-xs font-semibold text-amber-800 uppercase mb-1">Highest Education Level</label>
-          <select id="educationLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
-            <option value="Primary School">Primary School</option>
-            <option value="High School / Secondary">High School / Secondary</option>
-            <option value="TVET / Vocational">TVET / Vocational</option>
-            <option value="Diploma">Diploma</option>
-            <option value="Bachelor's Degree">Bachelor's Degree</option>
-            <option value="Master's / Postgraduate">Master's / Postgraduate</option>
-            <option value="Doctorate (PhD)">Doctorate (PhD)</option>
-            <option value="Customary / Other">Customary / Other</option>
-          </select>
+        <!-- SECTION 5: EDUCATION & EMPLOYMENT -->
+        <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-3">
+          <h3 class="text-xs font-bold text-cyan-800 uppercase tracking-wider">5. Education & Occupation</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Highest Education Level</label>
+              <select id="educationLevel" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+                <option value="Primary School">Primary School</option>
+                <option value="High School / Secondary">High School / Secondary</option>
+                <option value="TVET / Vocational">TVET / Vocational</option>
+                <option value="Diploma">Diploma</option>
+                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                <option value="Master's / Postgraduate">Master's / Postgraduate</option>
+                <option value="Doctorate (PhD)">Doctorate (PhD)</option>
+                <option value="Customary / Non-Formal">Customary / Non-Formal</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Institution / School Name</label>
+              <input type="text" id="institution" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="School/College Name">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Current Occupation / Job Title</label>
+              <input type="text" id="occupation" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Teacher, Farmer, Student">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Special Vocational Skills / Trade</label>
+              <input type="text" id="skills" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="e.g. Carpentry, Nursing, Computing">
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-semibold text-amber-800 uppercase mb-1">Institution / School Name</label>
-          <input type="text" id="institution" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none" placeholder="Name of school/university">
-        </div>
-
-        <button type="submit" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-lg shadow-md transition-colors flex items-center justify-center gap-2 text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-          Save Record To Cloud
+        <button type="submit" class="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl shadow-lg transition-colors flex items-center justify-center gap-2 text-base">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+          Save Complete Biodata
         </button>
       </form>
     </section>
 
-    <!-- DIRECTORY VIEW SECTION -->
-    <section class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+    <!-- DIRECTORY & RECORDS VIEW SECTION -->
+    <section class="lg:col-span-6 bg-white p-6 rounded-2xl shadow-lg border border-gray-200">
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-2 border-b border-gray-200">
         <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
           <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-          Association Directory
+          Master Registry
         </h2>
-        <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search by name, clan, village..." class="w-full sm:w-64 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
+        <input type="text" id="searchInput" oninput="filterRecords()" placeholder="Search name, phone, clan, village..." class="w-full sm:w-64 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:outline-none">
       </div>
 
-      <!-- MEMBER LIST DISPLAY -->
-      <div id="memberList" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[550px] overflow-y-auto pr-1">
-        <!-- Records rendered dynamically via JavaScript -->
+      <!-- MEMBER CARDS DISPLAY -->
+      <div id="memberList" class="space-y-4 max-h-[850px] overflow-y-auto pr-2">
+        <!-- Records loaded dynamically from Cloud Database -->
       </div>
     </section>
   </main>
 
   <script>
     let photoBase64 = "";
+    let fetchedRecords = [];
 
     function previewImage(event) {
       const file = event.target.files[0];
@@ -173,14 +266,28 @@
 
     async function saveMember(event) {
       event.preventDefault();
+      
       const memberData = {
         fullName: document.getElementById('fullName').value,
         gender: document.getElementById('gender').value,
         dob: document.getElementById('dob').value,
+        nationalId: document.getElementById('nationalId').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+        email: document.getElementById('email').value,
+        address: document.getElementById('address').value,
         clan: document.getElementById('clan').value,
+        subClan: document.getElementById('subClan').value,
         village: document.getElementById('village').value,
+        totem: document.getElementById('totem').value,
+        fatherName: document.getElementById('fatherName').value,
+        motherName: document.getElementById('motherName').value,
+        maritalStatus: document.getElementById('maritalStatus').value,
+        spouseName: document.getElementById('spouseName').value,
+        dependents: document.getElementById('dependents').value,
         educationLevel: document.getElementById('educationLevel').value,
         institution: document.getElementById('institution').value,
+        occupation: document.getElementById('occupation').value,
+        skills: document.getElementById('skills').value,
         photo: photoBase64 || "https://via.placeholder.com/80?text=Photo",
         createdAt: new Date().toISOString()
       };
@@ -189,17 +296,17 @@
         if (window.db && window.firestoreTools) {
           const { collection, addDoc } = window.firestoreTools;
           await addDoc(collection(window.db, "maletain_biodata_records"), memberData);
-          alert("Member record successfully saved to the cloud database!");
+          alert("Member biodata successfully saved to the cloud database!");
           document.getElementById('biodataForm').reset();
           document.getElementById('photoPreview').src = "https://via.placeholder.com/80?text=Photo";
           photoBase64 = "";
           loadCloudRecords();
         } else {
-          alert("Database connection initializing. Please try again in 3 seconds.");
+          alert("Database connection initializing. Please try again in a few seconds.");
         }
       } catch (e) {
-        console.error("Error adding document: ", e);
-        alert("Error saving record to database: " + e.message);
+        console.error("Error saving to database: ", e);
+        alert("Error saving record: " + e.message);
       }
     }
 
@@ -210,33 +317,63 @@
       const { collection, getDocs } = window.firestoreTools;
       try {
         const querySnapshot = await getDocs(collection(window.db, "maletain_biodata_records"));
-        container.innerHTML = "";
-        
-        if (querySnapshot.empty) {
-          container.innerHTML = `<p class="text-sm text-gray-500 col-span-2 text-center py-8">No member records found. Use the form to submit entries.</p>`;
-          return;
-        }
-
+        fetchedRecords = [];
         querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          container.innerHTML += `
-            <div class="bg-stone-50 border border-gray-200 p-4 rounded-lg shadow-sm flex items-start gap-3">
-              <img src="${data.photo}" class="w-14 h-14 rounded-full object-cover border border-cyan-500">
-              <div>
-                <h3 class="font-bold text-gray-900 text-sm">${data.fullName}</h3>
-                <p class="text-xs text-gray-600"><strong>Clan:</strong> ${data.clan}</p>
-                <p class="text-xs text-gray-600"><strong>Village:</strong> ${data.village}</p>
-                <span class="inline-block mt-1 text-[10px] px-2 py-0.5 bg-amber-100 text-amber-800 rounded font-semibold">${data.educationLevel}</span>
-              </div>
-            </div>
-          `;
+          fetchedRecords.push({ id: doc.id, ...doc.data() });
         });
+        renderRecords(fetchedRecords);
       } catch (err) {
-        console.error("Fetch error:", err);
+        console.error("Error fetching records:", err);
       }
     }
 
-    // Auto load on start
+    function renderRecords(records) {
+      const container = document.getElementById('memberList');
+      container.innerHTML = "";
+
+      if (records.length === 0) {
+        container.innerHTML = `<p class="text-sm text-gray-500 text-center py-12">No matching records found in database.</p>`;
+        return;
+      }
+
+      records.forEach((data) => {
+        container.innerHTML += `
+          <div class="bg-stone-50 border border-gray-200 p-4 rounded-xl shadow-sm space-y-2">
+            <div class="flex items-start gap-4">
+              <img src="${data.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-cyan-500 shadow-sm flex-shrink-0">
+              <div class="flex-1">
+                <div class="flex items-center justify-between">
+                  <h3 class="font-bold text-gray-900 text-base">${data.fullName}</h3>
+                  <span class="text-[10px] px-2 py-0.5 bg-cyan-100 text-cyan-800 rounded font-semibold">${data.gender || 'N/A'}</span>
+                </div>
+                <p class="text-xs text-gray-600"><strong>Phone:</strong> ${data.phoneNumber || 'N/A'} | <strong>Address:</strong> ${data.address || 'N/A'}</p>
+                <p class="text-xs text-gray-600"><strong>Clan:</strong> ${data.clan} (${data.subClan || 'Main'}) | <strong>Village:</strong> ${data.village}</p>
+              </div>
+            </div>
+            
+            <div class="pt-2 border-t border-gray-200 text-xs grid grid-cols-2 gap-2 text-gray-700">
+              <div><strong>Education:</strong> ${data.educationLevel}</div>
+              <div><strong>Occupation:</strong> ${data.occupation || 'N/A'}</div>
+              <div><strong>Parents:</strong> F: ${data.fatherName || 'N/A'} / M: ${data.motherName || 'N/A'}</div>
+              <div><strong>Family:</strong> ${data.maritalStatus || 'Single'} (${data.dependents || 0} Children)</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterRecords() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = fetchedRecords.filter(r => 
+        (r.fullName && r.fullName.toLowerCase().includes(query)) ||
+        (r.clan && r.clan.toLowerCase().includes(query)) ||
+        (r.village && r.village.toLowerCase().includes(query)) ||
+        (r.phoneNumber && r.phoneNumber.toLowerCase().includes(query))
+      );
+      renderRecords(filtered);
+    }
+
+    // Load records automatically on startup
     window.addEventListener('DOMContentLoaded', () => {
       setTimeout(loadCloudRecords, 1500);
     });
